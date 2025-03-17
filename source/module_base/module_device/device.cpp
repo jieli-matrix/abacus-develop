@@ -1,10 +1,11 @@
-
 #include "device.h"
 
 #include "module_base/tool_quit.h"
 
 #include <base/macros/macros.h>
 #include <cstring>
+#include <chrono>
+#include <iostream>
 
 #ifdef __MPI
 #include "mpi.h"
@@ -165,7 +166,12 @@ int device_count = -1;
 #if defined(__CUDA)
 cudaGetDeviceCount(&device_count);
 #elif defined(__ROCM)
+auto start_time = std::chrono::high_resolution_clock::now();
+std::cout << "Starting hipGetDeviceCount..." << std::endl;
 hipGetDeviceCount(&device_count);
+auto end_time = std::chrono::high_resolution_clock::now();
+auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+std::cout << "hipGetDeviceCount took " << duration.count() << " microseconds" << std::endl;
 #endif
 if (device_count <= 0)
 {
